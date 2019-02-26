@@ -10,40 +10,40 @@
 using namespace metal;
 
 namespace metalpetal {
-
+    
     vertex VertexOut passthroughVertex(
-        const device VertexIn * vertices [[ buffer(0) ]],
-        uint vid [[ vertex_id ]]
-    ) {
+                                       const device VertexIn * vertices [[ buffer(0) ]],
+                                       uint vid [[ vertex_id ]]
+                                       ) {
         VertexOut outVertex;
         VertexIn inVertex = vertices[vid];
         outVertex.position = inVertex.position;
         outVertex.textureCoordinate = inVertex.textureCoordinate;
         return outVertex;
     }
-
+    
     fragment float4 passthrough(
-        VertexOut vertexIn [[ stage_in ]],
-        texture2d<float, access::sample> colorTexture [[ texture(0) ]],
-        sampler colorSampler [[ sampler(0) ]]
-    ) {
-        return colorTexture.sample(colorSampler, vertexIn.textureCoordinate);
-    }
-
-    fragment float4 unpremultiplyAlpha(
                                 VertexOut vertexIn [[ stage_in ]],
                                 texture2d<float, access::sample> colorTexture [[ texture(0) ]],
                                 sampler colorSampler [[ sampler(0) ]]
                                 ) {
+        return colorTexture.sample(colorSampler, vertexIn.textureCoordinate);
+    }
+    
+    fragment float4 unpremultiplyAlpha(
+                                       VertexOut vertexIn [[ stage_in ]],
+                                       texture2d<float, access::sample> colorTexture [[ texture(0) ]],
+                                       sampler colorSampler [[ sampler(0) ]]
+                                       ) {
         float4 textureColor = colorTexture.sample(colorSampler, vertexIn.textureCoordinate);
         return unpremultiply(textureColor);
     }
     
     fragment float4 unpremultiplyAlphaWithSRGBToLinearRGB(
-                                       VertexOut vertexIn [[ stage_in ]],
-                                       texture2d<float, access::sample> colorTexture [[ texture(0) ]],
-                                       sampler colorSampler [[ sampler(0) ]]
-                                       ) {
+                                                          VertexOut vertexIn [[ stage_in ]],
+                                                          texture2d<float, access::sample> colorTexture [[ texture(0) ]],
+                                                          sampler colorSampler [[ sampler(0) ]]
+                                                          ) {
         float4 textureColor = colorTexture.sample(colorSampler, vertexIn.textureCoordinate);
         textureColor = unpremultiply(textureColor);
         return float4(sRGBToLinear(textureColor.rgb), textureColor.a);
@@ -52,99 +52,99 @@ namespace metalpetal {
     typedef struct {
         float4 color [[color(1)]];
     } ColorAttachmentOneOutput;
-
+    
     fragment ColorAttachmentOneOutput passthroughToColorAttachmentOne(
-                                              VertexOut vertexIn [[ stage_in ]],
-                                              texture2d<float, access::sample> colorTexture [[ texture(0) ]],
-                                              sampler colorSampler [[ sampler(0) ]]
-                                              ) {
+                                                                      VertexOut vertexIn [[ stage_in ]],
+                                                                      texture2d<float, access::sample> colorTexture [[ texture(0) ]],
+                                                                      sampler colorSampler [[ sampler(0) ]]
+                                                                      ) {
         ColorAttachmentOneOutput output;
         output.color = colorTexture.sample(colorSampler, vertexIn.textureCoordinate);
         return output;
     }
-
+    
     fragment ColorAttachmentOneOutput unpremultiplyAlphaToColorAttachmentOne(
-                                       VertexOut vertexIn [[ stage_in ]],
-                                       texture2d<float, access::sample> colorTexture [[ texture(0) ]],
-                                       sampler colorSampler [[ sampler(0) ]]
-                                       ) {
+                                                                             VertexOut vertexIn [[ stage_in ]],
+                                                                             texture2d<float, access::sample> colorTexture [[ texture(0) ]],
+                                                                             sampler colorSampler [[ sampler(0) ]]
+                                                                             ) {
         ColorAttachmentOneOutput output;
         float4 textureColor = colorTexture.sample(colorSampler, vertexIn.textureCoordinate);
         output.color = unpremultiply(textureColor);
         return output;
     }
-
+    
     fragment float4 premultiplyAlpha(
-                                       VertexOut vertexIn [[ stage_in ]],
-                                       texture2d<float, access::sample> colorTexture [[ texture(0) ]],
-                                       sampler colorSampler [[ sampler(0) ]]
-                                       ) {
+                                     VertexOut vertexIn [[ stage_in ]],
+                                     texture2d<float, access::sample> colorTexture [[ texture(0) ]],
+                                     sampler colorSampler [[ sampler(0) ]]
+                                     ) {
         float4 textureColor = colorTexture.sample(colorSampler, vertexIn.textureCoordinate);
         return premultiply(textureColor);
     }
     
     fragment float4 convertSRGBToLinearRGB(VertexOut vertexIn [[ stage_in ]],
-                                 texture2d<float, access::sample> colorTexture [[ texture(0) ]],
-                                 sampler colorSampler [[ sampler(0) ]]) {
+                                           texture2d<float, access::sample> colorTexture [[ texture(0) ]],
+                                           sampler colorSampler [[ sampler(0) ]]) {
         float4 textureColor = colorTexture.sample(colorSampler, vertexIn.textureCoordinate);
         textureColor.rgb = sRGBToLinear(textureColor.rgb);
         return textureColor;
     }
     
     fragment float4 convertLinearRGBToSRGB(VertexOut vertexIn [[ stage_in ]],
-                                 texture2d<float, access::sample> colorTexture [[ texture(0) ]],
-                                 sampler colorSampler [[ sampler(0) ]]) {
+                                           texture2d<float, access::sample> colorTexture [[ texture(0) ]],
+                                           sampler colorSampler [[ sampler(0) ]]) {
         float4 textureColor = colorTexture.sample(colorSampler, vertexIn.textureCoordinate);
         textureColor.rgb = linearToSRGB(textureColor.rgb);
         return textureColor;
     }
-
+    
     fragment float4 colorMatrixProjection(
-                                     VertexOut vertexIn [[ stage_in ]],
-                                     texture2d<float, access::sample> colorTexture [[ texture(0) ]],
-                                     sampler colorSampler [[ sampler(0) ]],
-                                     constant MTIColorMatrix & colorMatrix [[ buffer(0) ]]
-                                     ) {
+                                          VertexOut vertexIn [[ stage_in ]],
+                                          texture2d<float, access::sample> colorTexture [[ texture(0) ]],
+                                          sampler colorSampler [[ sampler(0) ]],
+                                          constant MTIColorMatrix & colorMatrix [[ buffer(0) ]]
+                                          ) {
         return colorTexture.sample(colorSampler, vertexIn.textureCoordinate) * colorMatrix.matrix + colorMatrix.bias;
     }
-
+    
     fragment float4 colorLookup2DSquare (
-                                VertexOut vertexIn [[stage_in]],
-                                texture2d<float, access::sample> sourceTexture [[texture(0)]],
-                                texture2d<float, access::sample> lutTexture [[texture(1)]],
-                                sampler colorSampler [[sampler(0)]],
-                                sampler lutSamper [[sampler(1)]],
-                                constant int & dimension [[buffer(0)]],
-                                constant float & intensity [[ buffer(1) ]]
-                                )
+                                         VertexOut vertexIn [[stage_in]],
+                                         texture2d<float, access::sample> sourceTexture [[texture(0)]],
+                                         texture2d<float, access::sample> lutTexture [[texture(1)]],
+                                         sampler colorSampler [[sampler(0)]],
+                                         sampler lutSamper [[sampler(1)]],
+                                         constant int & dimension [[buffer(0)]],
+                                         constant float & intensity [[ buffer(1) ]]
+                                         )
     {
         float2 sourceCoord = vertexIn.textureCoordinate;
         float4 color = sourceTexture.sample(colorSampler,sourceCoord);
         return colorLookup2DSquareLUT(color,dimension,intensity,lutTexture,lutSamper);
     }
-
+    
     fragment float4 colorLookup512x512Blend(VertexOut vertexIn [[ stage_in ]],
-                                    texture2d<float, access::sample> colorTexture [[ texture(0) ]],
-                                    sampler colorSampler [[ sampler(0) ]],
-                                    texture2d<float, access::sample> overlayTexture [[ texture(1) ]],
-                                    sampler overlaySampler [[ sampler(1) ]],
-                                    constant float &intensity [[buffer(0)]]
-                                    ) {
+                                            texture2d<float, access::sample> colorTexture [[ texture(0) ]],
+                                            sampler colorSampler [[ sampler(0) ]],
+                                            texture2d<float, access::sample> overlayTexture [[ texture(1) ]],
+                                            sampler overlaySampler [[ sampler(1) ]],
+                                            constant float &intensity [[buffer(0)]]
+                                            ) {
         float2 sourceCoord = vertexIn.textureCoordinate;
         float4 color = colorTexture.sample(colorSampler,sourceCoord);
         return colorLookup2DSquareLUT(color,64,intensity,overlayTexture,overlaySampler);
     }
-
-    #if __HAVE_COLOR_ARGUMENTS__
+    
+#if __HAVE_COLOR_ARGUMENTS__
     
     fragment float4 multilayerCompositeColorLookup512x512Blend(
-                                                       VertexOut vertexIn [[ stage_in ]],
-                                                       float4 currentColor [[color(0)]],
-                                                       float4 maskColor [[color(1)]],
-                                                       constant MTIMultilayerCompositingLayerShadingParameters & parameters [[buffer(0)]],
-                                                       texture2d<float, access::sample> colorTexture [[ texture(0) ]],
-                                                       sampler colorSampler [[ sampler(0) ]]
-                                                       ) {
+                                                               VertexOut vertexIn [[ stage_in ]],
+                                                               float4 currentColor [[color(0)]],
+                                                               float4 maskColor [[color(1)]],
+                                                               constant MTIMultilayerCompositingLayerShadingParameters & parameters [[buffer(0)]],
+                                                               texture2d<float, access::sample> colorTexture [[ texture(0) ]],
+                                                               sampler colorSampler [[ sampler(0) ]]
+                                                               ) {
         float intensity = 1.0;
         if (parameters.hasCompositingMask) {
             intensity *= maskColor[parameters.compositingMaskComponent];
@@ -153,7 +153,7 @@ namespace metalpetal {
         return colorLookup2DSquareLUT(currentColor,64,intensity,colorTexture,colorSampler);
     }
     
-    #else
+#else
     
     fragment float4 multilayerCompositeColorLookup512x512Blend(
                                                                VertexOut vertexIn [[ stage_in ]],
@@ -177,24 +177,9 @@ namespace metalpetal {
         return colorLookup2DSquareLUT(backgroundColor,64,intensity,colorTexture,colorSampler);
     }
     
-    #endif
+#endif
     
     fragment float4 colorLookup2DHorizontalStrip(
-                                         VertexOut vertexIn [[stage_in]],
-                                         texture2d<float, access::sample> sourceTexture [[texture(0)]],
-                                         texture2d<float, access::sample> lutTexture [[texture(1)]],
-                                         sampler colorSampler [[sampler(0)]],
-                                         sampler lutSamper [[sampler(1)]],
-                                         constant int & dimension [[buffer(0)]],
-                                         constant float & intensity [[ buffer(1) ]]
-                                         )
-    {
-        float2 sourceCoord = vertexIn.textureCoordinate;
-        float4 textureColor = sourceTexture.sample(colorSampler,sourceCoord);
-        return colorLookup2DStripLUT(textureColor, dimension, true, intensity, lutTexture, lutSamper);
-    }
-    
-    fragment float4 colorLookup2DVerticalStrip(
                                                  VertexOut vertexIn [[stage_in]],
                                                  texture2d<float, access::sample> sourceTexture [[texture(0)]],
                                                  texture2d<float, access::sample> lutTexture [[texture(1)]],
@@ -206,19 +191,34 @@ namespace metalpetal {
     {
         float2 sourceCoord = vertexIn.textureCoordinate;
         float4 textureColor = sourceTexture.sample(colorSampler,sourceCoord);
+        return colorLookup2DStripLUT(textureColor, dimension, true, intensity, lutTexture, lutSamper);
+    }
+    
+    fragment float4 colorLookup2DVerticalStrip(
+                                               VertexOut vertexIn [[stage_in]],
+                                               texture2d<float, access::sample> sourceTexture [[texture(0)]],
+                                               texture2d<float, access::sample> lutTexture [[texture(1)]],
+                                               sampler colorSampler [[sampler(0)]],
+                                               sampler lutSamper [[sampler(1)]],
+                                               constant int & dimension [[buffer(0)]],
+                                               constant float & intensity [[ buffer(1) ]]
+                                               )
+    {
+        float2 sourceCoord = vertexIn.textureCoordinate;
+        float4 textureColor = sourceTexture.sample(colorSampler,sourceCoord);
         return colorLookup2DStripLUT(textureColor, dimension, false, intensity, lutTexture, lutSamper);
     }
-
+    
     fragment float4 blendWithMask(
-                                         VertexOut vertexIn [[stage_in]],
-                                         texture2d<float, access::sample> overlayTexture [[texture(0)]],
-                                         texture2d<float, access::sample> maskTexture [[texture(1)]],
-                                         texture2d<float, access::sample> baseTexture [[texture(2)]],
-                                         sampler overlaySampler [[sampler(0)]],
-                                         sampler maskSampler [[sampler(1)]],
-                                         sampler baseSampler [[sampler(2)]],
-                                         constant int &maskComponent [[ buffer(0) ]],
-                                         constant bool &usesOneMinusMaskValue [[ buffer(1) ]]) {
+                                  VertexOut vertexIn [[stage_in]],
+                                  texture2d<float, access::sample> overlayTexture [[texture(0)]],
+                                  texture2d<float, access::sample> maskTexture [[texture(1)]],
+                                  texture2d<float, access::sample> baseTexture [[texture(2)]],
+                                  sampler overlaySampler [[sampler(0)]],
+                                  sampler maskSampler [[sampler(1)]],
+                                  sampler baseSampler [[sampler(2)]],
+                                  constant int &maskComponent [[ buffer(0) ]],
+                                  constant bool &usesOneMinusMaskValue [[ buffer(1) ]]) {
         float4 overlayColor = overlayTexture.sample(overlaySampler, vertexIn.textureCoordinate);
         float4 maskColor = maskTexture.sample(maskSampler, vertexIn.textureCoordinate);
         float maskValue = maskColor[maskComponent];
@@ -226,7 +226,7 @@ namespace metalpetal {
         overlayColor.a = overlayColor.a * (usesOneMinusMaskValue ? (1.0 - maskValue) : maskValue);
         return normalBlend(baseColor, overlayColor);
     }
-
+    
     fragment float4 vibranceAdjust(
                                    VertexOut vertexIn [[stage_in]],
                                    texture2d<float, access::sample> sourceTexture [[texture(0)]],
@@ -241,14 +241,14 @@ namespace metalpetal {
         (avoidsSaturatingSkinTones ? adjustVibranceWhileKeepingSkinTones(textureColor, vibranceVector) : adjustVibrance(textureColor, amount, grayColorTransform))
         : adjustSaturation(textureColor, amount, grayColorTransform);
     }
-
+    
     fragment float4 rToMonochrome(
-                            VertexOut vertexIn [[stage_in]],
-                            texture2d<float, access::sample> sourceTexture [[texture(0)]],
-                            sampler sourceSampler [[sampler(0)]],
-                            constant bool & invert [[buffer(0)]],
-                            constant bool & convertSRGBToLinear [[buffer(1)]]
-                           ) {
+                                  VertexOut vertexIn [[stage_in]],
+                                  texture2d<float, access::sample> sourceTexture [[texture(0)]],
+                                  sampler sourceSampler [[sampler(0)]],
+                                  constant bool & invert [[buffer(0)]],
+                                  constant bool & convertSRGBToLinear [[buffer(1)]]
+                                  ) {
         float4 textureColor = sourceTexture.sample(sourceSampler, vertexIn.textureCoordinate);
         if (convertSRGBToLinear) {
             textureColor.r = sRGBToLinear(textureColor.r);
@@ -257,13 +257,13 @@ namespace metalpetal {
     }
     
     fragment float4 rgToMonochrome(
-                            VertexOut vertexIn [[stage_in]],
-                            texture2d<float, access::sample> sourceTexture [[texture(0)]],
-                            sampler sourceSampler [[sampler(0)]],
-                            constant int & alphaChannelIndex [[buffer(0)]],
-                            constant bool & unpremultiplyAlpha [[buffer(1)]],
-                            constant bool & convertSRGBToLinear [[buffer(2)]]
-                            ) {
+                                   VertexOut vertexIn [[stage_in]],
+                                   texture2d<float, access::sample> sourceTexture [[texture(0)]],
+                                   sampler sourceSampler [[sampler(0)]],
+                                   constant int & alphaChannelIndex [[buffer(0)]],
+                                   constant bool & unpremultiplyAlpha [[buffer(1)]],
+                                   constant bool & convertSRGBToLinear [[buffer(2)]]
+                                   ) {
         float4 textureColor = sourceTexture.sample(sourceSampler, vertexIn.textureCoordinate);
         float alpha = textureColor[alphaChannelIndex];
         float color = textureColor[1 - alphaChannelIndex] / (unpremultiplyAlpha ? max(alpha,0.00001) : 1.0);
@@ -272,16 +272,16 @@ namespace metalpetal {
         }
         return float4(float3(color),alpha);
     }
-
+    
     fragment float4 chromaKeyBlend(
-                                  VertexOut vertexIn [[stage_in]],
-                                  texture2d<float, access::sample> sourceTexture [[texture(0)]],
-                                  texture2d<float, access::sample> backgroundTexture [[texture(1)]],
-                                  sampler sourceSampler [[sampler(0)]],
-                                  sampler backgroundSampler [[sampler(1)]],
-                                  constant float4 &color [[buffer(0)]],
-                                  constant float &thresholdSensitivity [[buffer(1)]],
-                                  constant float &smoothing [[buffer(2)]]) {
+                                   VertexOut vertexIn [[stage_in]],
+                                   texture2d<float, access::sample> sourceTexture [[texture(0)]],
+                                   texture2d<float, access::sample> backgroundTexture [[texture(1)]],
+                                   sampler sourceSampler [[sampler(0)]],
+                                   sampler backgroundSampler [[sampler(1)]],
+                                   constant float4 &color [[buffer(0)]],
+                                   constant float &thresholdSensitivity [[buffer(1)]],
+                                   constant float &smoothing [[buffer(2)]]) {
         float4 textureColor = sourceTexture.sample(sourceSampler, vertexIn.textureCoordinate);
         float4 textureColor2 = backgroundTexture.sample(backgroundSampler, vertexIn.textureCoordinate);
         
@@ -297,32 +297,32 @@ namespace metalpetal {
         
         return mix(textureColor, textureColor2, blendValue);
     }
-
+    
     fragment float4 pixellate(VertexOut vertexIn [[stage_in]],
-                            texture2d<float, access::sample> sourceTexture [[texture(0)]],
-                            sampler sourceSampler [[sampler(0)]],
-                            constant float2 &scale [[buffer(0)]]
-                            ) {
+                              texture2d<float, access::sample> sourceTexture [[texture(0)]],
+                              sampler sourceSampler [[sampler(0)]],
+                              constant float2 &scale [[buffer(0)]]
+                              ) {
         float2 textureSize = float2(sourceTexture.get_width(), sourceTexture.get_height());
         float2 textureCoordinate = vertexIn.textureCoordinate * textureSize;
         float2 samplePos = textureCoordinate - fmod(textureCoordinate, scale) + scale * 0.5;
         return sourceTexture.sample(sourceSampler, samplePos/textureSize);
     }
-
+    
     fragment float4 rgbToneCurveAdjust(
-                                   VertexOut vertexIn [[stage_in]],
-                                   texture2d<float, access::sample> sourceTexture [[texture(0)]],
-                                   texture2d<float, access::sample> toneCurveTexture [[texture(1)]],
-                                   sampler sourceSampler [[sampler(0)]],
-                                   sampler toneCurveSampler [[sampler(1)]],
-                                   constant float &intensity [[buffer(0)]]) {
+                                       VertexOut vertexIn [[stage_in]],
+                                       texture2d<float, access::sample> sourceTexture [[texture(0)]],
+                                       texture2d<float, access::sample> toneCurveTexture [[texture(1)]],
+                                       sampler sourceSampler [[sampler(0)]],
+                                       sampler toneCurveSampler [[sampler(1)]],
+                                       constant float &intensity [[buffer(0)]]) {
         float4 textureColor = sourceTexture.sample(sourceSampler, vertexIn.textureCoordinate);
         float r = toneCurveTexture.sample(toneCurveSampler, float2((textureColor.r * 255.0 + 0.5)/256.0, 0.5)).r;
         float g = toneCurveTexture.sample(toneCurveSampler, float2((textureColor.g * 255.0 + 0.5)/256.0, 0.5)).g;
         float b = toneCurveTexture.sample(toneCurveSampler, float2((textureColor.b * 255.0 + 0.5)/256.0, 0.5)).b;
         return mix(textureColor, float4(r,g,b,textureColor.a), intensity);
     }
-
+    
     namespace usm {
         
         METAL_FUNC float3 rgb2yuv(float3 color) {
@@ -341,13 +341,13 @@ namespace metalpetal {
         }
         
         fragment float4 usmSecondPass(
-                                             VertexOut vertexIn [[stage_in]],
-                                             texture2d<float, access::sample> sourceTexture [[texture(0)]],
-                                             texture2d<float, access::sample> blurTexture [[texture(1)]],
-                                             sampler sourceSampler [[sampler(0)]],
-                                             sampler blurSampler [[sampler(1)]],
-                                             constant float &scale [[buffer(0)]],
-                                             constant float &threshold [[buffer(1)]]) {
+                                      VertexOut vertexIn [[stage_in]],
+                                      texture2d<float, access::sample> sourceTexture [[texture(0)]],
+                                      texture2d<float, access::sample> blurTexture [[texture(1)]],
+                                      sampler sourceSampler [[sampler(0)]],
+                                      sampler blurSampler [[sampler(1)]],
+                                      constant float &scale [[buffer(0)]],
+                                      constant float &threshold [[buffer(1)]]) {
             float4 textureColor = sourceTexture.sample(sourceSampler, vertexIn.textureCoordinate);
             float4 blurColor = blurTexture.sample(blurSampler, vertexIn.textureCoordinate);
             float3 textureYUV = rgb2yuv(textureColor.rgb);
@@ -420,9 +420,9 @@ namespace metalpetal {
     }
     
     kernel void colorLookupTable2DStripVerticalTo3D(texture2d<float, access::read> sourceTexture [[texture(0)]],
-                                             texture3d<float, access::write> outTexture [[texture(1)]],
-                                             constant int & dimension [[buffer(0)]],
-                                             uint3 gid [[ thread_position_in_grid ]]) {
+                                                    texture3d<float, access::write> outTexture [[texture(1)]],
+                                                    constant int & dimension [[buffer(0)]],
+                                                    uint3 gid [[ thread_position_in_grid ]]) {
         if (gid.x < outTexture.get_width() &&
             gid.y < outTexture.get_height() &&
             gid.z < outTexture.get_depth()) {
@@ -434,9 +434,9 @@ namespace metalpetal {
     }
     
     kernel void colorLookupTable2DStripHorizontalTo3D(texture2d<float, access::read> sourceTexture [[texture(0)]],
-                                             texture3d<float, access::write> outTexture [[texture(1)]],
-                                             constant int & dimension [[buffer(0)]],
-                                             uint3 gid [[ thread_position_in_grid ]]) {
+                                                      texture3d<float, access::write> outTexture [[texture(1)]],
+                                                      constant int & dimension [[buffer(0)]],
+                                                      uint3 gid [[ thread_position_in_grid ]]) {
         if (gid.x < outTexture.get_width() &&
             gid.y < outTexture.get_height() &&
             gid.z < outTexture.get_depth()) {
@@ -461,20 +461,20 @@ namespace metalpetal {
     }
     
     /*
-    fragment float4 histogramDisplay(VertexOut vertexIn [[stage_in]],
-                                     texture2d<uint, access::sample> sourceTexture [[texture(0)]],
-                                     sampler sourceSampler [[sampler(0)]],
-                                     texture2d<uint, access::read> maxValueTexture [[texture(1)]]) {
-        uint rValue = sourceTexture.sample(sourceSampler, float2(vertexIn.textureCoordinate.x, 0.5/4.0)).r;
-        uint gValue = sourceTexture.sample(sourceSampler, float2(vertexIn.textureCoordinate.x, 1.5/4.0)).r;
-        uint bValue = sourceTexture.sample(sourceSampler, float2(vertexIn.textureCoordinate.x, 2.5/4.0)).r;
-        uint4 maxValue = maxValueTexture.read(uint2(0,0));
-        float3 height = float3(rValue, gValue, bValue)/float3(max(max(maxValue.r, maxValue.g),maxValue.b));
-        bool3 fill = vertexIn.textureCoordinate.y > 1.0 - height;
-        return float4(float3(fill), 1.0);
-        //return float4(float3(value.rgb)/float3(maxValue.rgb), 1.0);
-    }
-    */
+     fragment float4 histogramDisplay(VertexOut vertexIn [[stage_in]],
+     texture2d<uint, access::sample> sourceTexture [[texture(0)]],
+     sampler sourceSampler [[sampler(0)]],
+     texture2d<uint, access::read> maxValueTexture [[texture(1)]]) {
+     uint rValue = sourceTexture.sample(sourceSampler, float2(vertexIn.textureCoordinate.x, 0.5/4.0)).r;
+     uint gValue = sourceTexture.sample(sourceSampler, float2(vertexIn.textureCoordinate.x, 1.5/4.0)).r;
+     uint bValue = sourceTexture.sample(sourceSampler, float2(vertexIn.textureCoordinate.x, 2.5/4.0)).r;
+     uint4 maxValue = maxValueTexture.read(uint2(0,0));
+     float3 height = float3(rValue, gValue, bValue)/float3(max(max(maxValue.r, maxValue.g),maxValue.b));
+     bool3 fill = vertexIn.textureCoordinate.y > 1.0 - height;
+     return float4(float3(fill), 1.0);
+     //return float4(float3(value.rgb)/float3(maxValue.rgb), 1.0);
+     }
+     */
     
     fragment float4 bulgeDistortion(VertexOut vertexIn [[stage_in]],
                                     texture2d<float, access::sample> sourceTexture [[texture(0)]],
